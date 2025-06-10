@@ -86,9 +86,9 @@ class Ball {
       let impulse = (2 * speed) / (this.mass + other.mass); //v
       impulse *= restitution;
 
-      // P = mv
-      this.vel.sub(p5.Vector.mult(normal, impulse * other.mass));
-      other.vel.add(p5.Vector.mult(normal, impulse * this.mass));
+      // // P = mv
+      // this.vel.sub(p5.Vector.mult(normal, impulse * other.mass));
+      // other.vel.add(p5.Vector.mult(normal, impulse * this.mass));
     }
   }
 
