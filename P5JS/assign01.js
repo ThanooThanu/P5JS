@@ -25,7 +25,7 @@ class Ball {
     this.mass = this.radius * this.radius * 0.1;
     this.x = x;
     this.y = y;
-    this.vx = 0;
+    this.vx = random(-1,1);
     this.vy = 0;
     this.color = color(random(0, 255), random(0, 255), random(0, 255));
   }
