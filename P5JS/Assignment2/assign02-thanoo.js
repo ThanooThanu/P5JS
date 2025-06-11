@@ -8,6 +8,7 @@ function setup() {
 
 function draw() {
   background(0);
+  drawBackgroundZones();
 
   for (let i = 0; i < balls.length; i++) {
     for (let j = i + 1; j < balls.length; j++) {
@@ -56,6 +57,20 @@ class Ball {
   }
 
   update() {
+    let dragCoefficient = getZoneDrag(this.x, this.y);
+
+    let speed = sqrt(this.vx * this.vx + this.vy * this.vy);
+    if (speed !==0) {
+      let ux = this.vx/speed;
+      let uy = this.vy/speed;
+
+      let dragMagnitude = dragCoefficient * speed * speed;
+      let dragFx = -dragMagnitude * ux;
+      let dragFy = -dragMagnitude * uy;
+
+      this.applyForce(dragFx, dragFy);
+    }
+
     this.vx += this.ax;
     this.vy += this.ay;
     this.x += this.vx;
@@ -133,4 +148,46 @@ function resolveCollision(a, b) {
       b.vy -= (impulse / b.mass) * ny;
     }
   }
+}
+
+function drawBackgroundZones() {
+  noStroke();
+
+  fill(180, 220, 255);
+  rect(0, 0, width / 2, height / 2); // Top-left
+
+  fill(0, 0, 50);
+  rect(width / 2, 0, width, height); // Top-right
+
+  fill(255, 230, 180);
+  rect(0, height / 2, width / 2, height); // Bottom-left
+
+  fill(180, 255, 180);
+  rect(width / 2, height / 2, width, height); // Bottom-right
+
+  stroke(0);
+  strokeWeight(2);
+  line(width / 2, 0, width / 2, height);
+  line(0, height / 2, width, height / 2);
+
+  noStroke();
+  fill(0);
+  textSize(16);
+  textAlign(CENTER, CENTER);
+  fill(0,0,100);
+  text("Air", width * 0.25, height * 0.25);
+  fill(255);
+  text("Space", width * 0.75, height  * 0.25);
+  fill(0);
+  text("Desert", width * 0.25,height * 0.75);
+  fill(0,100,0);
+  text("Grassland", width * 0.75, height * 0.75);
+}
+
+function getZoneDrag(x, y) {
+  if (x < width / 2 && y < height / 2) return 0.01;  // Air: low drag
+  if (x >= width / 2 && y < height / 2) return 0.0001; // Space: almost no drag
+  if (x < width / 2 && y >= height / 2) return 0.1;   // Desert: high drag
+  if (x >= width / 2 && y >= height / 2) return 0.05; // Grassland: moderate
+  return 0.01;
 }
