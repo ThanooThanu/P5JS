@@ -10,10 +10,13 @@ function draw() {
   background(0);
   drawBackgroundZones();
 
+  let ballsToRemove = new Set();
+  let ballsToAdd = [];
+
   for (let i = 0; i < balls.length; i++) {
     for (let j = i + 1; j < balls.length; j++) {
       applyGravity(balls[i], balls[j]);
-      resolveCollision(balls[i], balls[j]);
+      resolveCollision(balls[i], balls[j], ballsToRemove, ballsToAdd);
     }
   }
 
@@ -21,12 +24,15 @@ function draw() {
     b.update();
     b.show();
   }
+
+  balls = balls.filter(b => !ballsToRemove.has(b));
+  balls.push(...ballsToAdd);
 }
 
 function mousePressed() {
   let tries = 100;
   while (tries-- > 0) {
-    let r = random(20, 40);
+    let r = random (20,40);
     let x = mouseX;
     let y = mouseY;
 
@@ -116,13 +122,34 @@ function applyGravity(a, b) {
   b.applyForce(-fx, -fy);
 }
 
-function resolveCollision(a, b) {
+function resolveCollision(a, b, ballsToRemove, ballsToAdd) {
   let dx = b.x - a.x;
   let dy = b.y - a.y;
   let dist = sqrt(dx * dx + dy * dy);
   let minDist = a.r + b.r;
 
   if (dist < minDist && dist > 0) {
+    
+    let bigger, smaller;
+
+    if (a.r > b.r) {
+      bigger = a;
+      smaller = b;
+    } else if (b.r > a.r) {
+      bigger = b;
+      smaller = a;
+    }
+
+    if (bigger && bigger.r > 10) { 
+      ballsToRemove.add(bigger);
+      let newR = bigger.r / 2;
+      let offset = newR + 2;
+      ballsToAdd.push(
+        new Ball(bigger.x + offset, bigger.y, newR),
+        new Ball(bigger.x - offset, bigger.y, newR)
+      );
+    }
+    
     let nx = dx / dist;
     let ny = dy / dist;
 
